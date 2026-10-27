@@ -1,0 +1,42 @@
+{
+  "created_at": "2026-10-27T17:01:42+00:00",
+  "godot_version": "4.7.2.stable.official.ed1daf0bf",
+  "source_difference": "godot/assets/oschersleben.glb.import: meshes/force_disable_compression false -> true",
+  "reference": {
+    "commit": "41ac7177bc0df704f1e7d0a4be32f4dac7572cd8",
+    "godot_tree": "3f9c5dd02e63b75dec2ae04dfaab90f5de4f5093",
+    "files": {
+      "build-41ac7177bc0d.js": {
+        "bytes": 279815,
+        "sha256": "33c94cb3175f3333b82e2a3be5e8e86f77986f0aa2042b1631f6367a4e5bb6ba"
+      },
+      "build-41ac7177bc0d.wasm": {
+        "bytes": 39514754,
+        "sha256": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0"
+      },
+      "build-41ac7177bc0d.pck": {
+        "bytes": 4923920,
+        "sha256": "ab806f0ae44fcb055b2bc6fb7a477ef69fa521240734070d931354f0d4e49e6d"
+      }
+    }
+  },
+  "candidate": {
+    "commit": "d27b5bd111f4ecd98f62ed26f632954029772c1e",
+    "godot_tree": "78db78e7607d324a38a83fae0e9444ed9715a5cf",
+    "files": {
+      "build-d27b5bd111f4.js": {
+        "bytes": 279815,
+        "sha256": "33c94cb3175f3333b82e2a3be5e8e86f77986f0aa2042b1631f6367a4e5bb6ba"
+      },
+      "build-d27b5bd111f4.wasm": {
+        "bytes": 39514754,
+        "sha256": "fc74679e3b97f76878947fcd4fbe1268cbfa6188182a2e33bbc3f5dc9bfa57d0"
+      },
+      "build-d27b5bd111f4.pck": {
+        "bytes": 5125360,
+        "sha256": "7cfde966bc28e4bd3ce915c57dadef979568e6d39b851263c2576327118bce9b"
+      }
+    }
+  },
+  "note": "Temporary controlled A/B pair, not a main release or an accepted performance baseline. Sizes are uncompressed file bytes, not RAM or HTTP transfer bytes."
+}
