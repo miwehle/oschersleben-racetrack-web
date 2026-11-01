@@ -1,6 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+<script>
+/* Installed inline before the engine loader. Always local; no storage or network. */
+(() => {
+  if (window.OscherslebenStartup) return;
+  const p = performance;
+  const marks = {page_script_ms: p.now(), engine_start_ms: null, scene_ready_ms: null, ready_ms: null};
+  let result = null, loaderHidden = false, hidden = document.hidden;
+  const visibility = () => { hidden = hidden || document.hidden; };
+  document.addEventListener('visibilitychange', visibility);
+  const round = n => Number.isFinite(n) ? Math.round(n * 100) / 100 : null;
+  function delivery(r) {
+    // Service-worker timings do not reveal where its response came from.
+    if (!r || r.workerStart > 0 || !(r.responseEnd > 0) ||
+        !(r.encodedBodySize > 0) || !Number.isFinite(r.transferSize) || r.transferSize < 0) return 'unknown';
+    if (r.transferSize === 0) return 'cache';
+    if (r.deliveryType === 'cache' || r.transferSize < r.encodedBodySize) return 'revalidated';
+    return r.transferSize > r.encodedBodySize ? 'network' : 'unknown';
+  }
+  function ready() {
+    if (result || !loaderHidden || marks.scene_ready_ms === null) return;
+    marks.ready_ms = p.now();
+    document.removeEventListener('visibilitychange', visibility);
+    const nav = p.getEntriesByType('navigation')[0];
+    // Resource timings can overlap compilation. These are milestones, not additive CPU phases.
+    const resources = p.getEntriesByType('resource').filter(r => r.startTime <= marks.ready_ms &&
+      /\.(wasm|pck|js|png)(?:[?#]|$)/.test(r.name) && new URL(r.name, location.href).origin === location.origin);
+    const entries = nav ? [nav, ...resources] : resources;
+    const sum = field => entries.length && entries.every(e => Number.isFinite(e[field]))
+      ? entries.reduce((total, e) => total + e[field], 0) : null;
+    const assets = resources.filter(r => /\.(wasm|pck)(?:[?#]|$)/.test(r.name));
+    const wasm = resources.filter(r => /\.wasm(?:[?#]|$)/.test(r.name));
+    const stem = wasm.length === 1 ? new URL(wasm[0].name).pathname.replace(/\.wasm$/, '') : null;
+    const asset_delivery = {};
+    for (const ext of ['js', 'wasm', 'pck']) {
+      const matches = resources.filter(r => new URL(r.name).pathname === stem + '.' + ext);
+      asset_delivery[ext] = matches.length === 1 ? delivery(matches[0]) : 'unknown';
+    }
+    const types = Object.values(asset_delivery);
+    const cache = types.includes('unknown') ? 'unknown' :
+      types.every(t => t === 'network') ? 'network' : types.includes('network') ? 'mixed' :
+      types.includes('revalidated') ? 'revalidated' : 'cache';
+    result = {
+      schema: 1, page_start_id: String(p.timeOrigin) + '-' + Math.random().toString(36).slice(2),
+      utc: Date.now(), total_ms: round(marks.ready_ms),
+      milestones_ms: Object.fromEntries(Object.entries(marks).map(([key, value]) => [key, round(value)])),
+      assets_finished_ms: assets.length ? round(Math.max(...assets.map(r => r.responseEnd))) : null,
+      transfer_bytes: sum('transferSize'), encoded_body_bytes: sum('encodedBodySize'),
+      resource_count: entries.length, timing_available: !!nav,
+      navigation_type: nav?.type || 'unknown', cache, asset_delivery, hidden_during_start: !!hidden
+    };
+  }
+  window.OscherslebenStartup = {
+    engineStart() { if (marks.engine_start_ms === null) marks.engine_start_ms = p.now(); },
+    sceneReady() { if (marks.scene_ready_ms === null) marks.scene_ready_ms = p.now(); ready(); },
+    loaderReady() { loaderHidden = true; ready(); },
+    snapshot() { return result ? JSON.parse(JSON.stringify(result)) : null; }
+  };
+})();
+
+</script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>oschersleben_racetrack</title>
@@ -90,8 +150,8 @@ body {
 	z-index: 1;
 }
 		</style>
-		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-2d67356437ad.icon.png" />
-<link rel="apple-touch-icon" href="build-2d67356437ad.apple-touch-icon.png"/>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-22db47cfb0dc.icon.png" />
+<link rel="apple-touch-icon" href="build-22db47cfb0dc.apple-touch-icon.png"/>
 
 	</head>
 	<body>
@@ -104,14 +164,14 @@ body {
 		</noscript>
 
 		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-2d67356437ad.png" alt="">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-22db47cfb0dc.png" alt="">
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="build-2d67356437ad.js"></script>
+		<script src="build-22db47cfb0dc.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-2d67356437ad","experimentalVK":true,"fileSizes":{"build-2d67356437ad.pck":5137876,"build-2d67356437ad.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-22db47cfb0dc","experimentalVK":true,"fileSizes":{"build-22db47cfb0dc.pck":5188860,"build-22db47cfb0dc.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -199,6 +259,7 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 	} else {
 		setStatusMode('progress');
+		window.OscherslebenStartup.engineStart();
 		engine.startGame({
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
@@ -211,6 +272,7 @@ const engine = new Engine(GODOT_CONFIG);
 			},
 		}).then(() => {
 			setStatusMode('hidden');
+			window.OscherslebenStartup.loaderReady();
 		}, displayFailureNotice);
 	}
 }());
