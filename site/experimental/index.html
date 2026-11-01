@@ -1,6 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+<script>
+/* Installed inline before the engine loader. Always local; no storage or network. */
+(() => {
+  if (window.OscherslebenStartup) return;
+  const p = performance;
+  const marks = {page_script_ms: p.now(), engine_start_ms: null, scene_ready_ms: null, ready_ms: null};
+  let result = null, loaderHidden = false, hidden = document.hidden;
+  const visibility = () => { hidden = hidden || document.hidden; };
+  document.addEventListener('visibilitychange', visibility);
+  const round = n => Number.isFinite(n) ? Math.round(n * 100) / 100 : null;
+  function ready() {
+    if (result || !loaderHidden || marks.scene_ready_ms === null) return;
+    marks.ready_ms = p.now();
+    document.removeEventListener('visibilitychange', visibility);
+    const nav = p.getEntriesByType('navigation')[0];
+    // Resource timings can overlap compilation. These are milestones, not additive CPU phases.
+    const resources = p.getEntriesByType('resource').filter(r => r.startTime <= marks.ready_ms &&
+      /\.(wasm|pck|js|png)(?:[?#]|$)/.test(r.name) && new URL(r.name, location.href).origin === location.origin);
+    const entries = nav ? [nav, ...resources] : resources;
+    const sum = field => entries.length && entries.every(e => Number.isFinite(e[field]))
+      ? entries.reduce((total, e) => total + e[field], 0) : null;
+    const assets = resources.filter(r => /\.(wasm|pck)(?:[?#]|$)/.test(r.name));
+    result = {
+      schema: 1, page_start_id: String(p.timeOrigin) + '-' + Math.random().toString(36).slice(2),
+      utc: Date.now(), total_ms: round(marks.ready_ms),
+      milestones_ms: Object.fromEntries(Object.entries(marks).map(([key, value]) => [key, round(value)])),
+      assets_finished_ms: assets.length ? round(Math.max(...assets.map(r => r.responseEnd))) : null,
+      transfer_bytes: sum('transferSize'), encoded_body_bytes: sum('encodedBodySize'),
+      resource_count: entries.length, timing_available: !!nav,
+      navigation_type: nav?.type || 'unknown', cache: 'unknown', hidden_during_start: !!hidden
+    };
+  }
+  window.OscherslebenStartup = {
+    engineStart() { if (marks.engine_start_ms === null) marks.engine_start_ms = p.now(); },
+    sceneReady() { if (marks.scene_ready_ms === null) marks.scene_ready_ms = p.now(); ready(); },
+    loaderReady() { loaderHidden = true; ready(); },
+    snapshot() { return result ? JSON.parse(JSON.stringify(result)) : null; }
+  };
+})();
+
+</script>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>EXPERIMENTAL · oschersleben_racetrack</title>
@@ -90,8 +131,8 @@ body {
 	z-index: 1;
 }
 		</style>
-		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-cc6d4b07cd88.icon.png" />
-<link rel="apple-touch-icon" href="build-cc6d4b07cd88.apple-touch-icon.png"/>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-9ba901ee970e.icon.png" />
+<link rel="apple-touch-icon" href="build-9ba901ee970e.apple-touch-icon.png"/>
 
 	</head>
 	<body>
@@ -104,14 +145,14 @@ body {
 		</noscript>
 
 		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-cc6d4b07cd88.png" alt="">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-9ba901ee970e.png" alt="">
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="build-cc6d4b07cd88.js"></script>
+		<script src="build-9ba901ee970e.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-cc6d4b07cd88","experimentalVK":true,"fileSizes":{"build-cc6d4b07cd88.pck":5163696,"build-cc6d4b07cd88.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-9ba901ee970e","experimentalVK":true,"fileSizes":{"build-9ba901ee970e.pck":5186364,"build-9ba901ee970e.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -199,6 +240,7 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 	} else {
 		setStatusMode('progress');
+		window.OscherslebenStartup.engineStart();
 		engine.startGame({
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
@@ -211,11 +253,12 @@ const engine = new Engine(GODOT_CONFIG);
 			},
 		}).then(() => {
 			setStatusMode('hidden');
+			window.OscherslebenStartup.loaderReady();
 		}, displayFailureNotice);
 	}
 }());
 		</script>
-	<div style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:10000;pointer-events:none;background:#392800e8;color:#ffe29a;padding:3px 8px;border-radius:5px;font:12px system-ui">EXPERIMENTAL · cc6d4b0</div>
+	<div style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:10000;pointer-events:none;background:#392800e8;color:#ffe29a;padding:3px 8px;border-radius:5px;font:12px system-ui">EXPERIMENTAL · 9ba901e</div>
 </body>
 </html>
 
