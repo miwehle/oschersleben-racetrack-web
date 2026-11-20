@@ -8,12 +8,20 @@
   const p = performance;
   const marks = {
     page_script_ms: p.now(), engine_start_ms: null, godot_script_start_ms: null,
-    player_ready_start_ms: null, player_ready_end_ms: null, scene_ready_ms: null, ready_ms: null
+    player_ready_start_ms: null, player_ready_end_ms: null, scene_ready_ms: null, ready_ms: null,
+    graphics_start_ms: null, graphics_end_ms: null, lightmaps_start_ms: null, lightmaps_end_ms: null,
+    ground_placed_ms: null, scene_ready_wait_start_ms: null, frame_wait_start_ms: null,
+    frame_drawn_ms: null, loader_hidden_ms: null
   };
   let result = null, loaderHidden = false, hidden = document.hidden;
   const visibility = () => { hidden = hidden || document.hidden; };
   document.addEventListener('visibilitychange', visibility);
   const round = n => Number.isFinite(n) ? Math.round(n * 100) / 100 : null;
+  function mark(name) {
+    if (result || typeof name !== 'string' ||
+        !(Object.hasOwn(marks, name) || /^extension_[a-z0-9_]+_(start|end)_ms$/.test(name))) return;
+    if (marks[name] == null) marks[name] = p.now();
+  }
   function delivery(r) {
     // Service-worker timings do not reveal where its response came from.
     if (!r || r.workerStart > 0 || !(r.responseEnd > 0) ||
@@ -56,12 +64,13 @@
     };
   }
   window.OscherslebenStartup = {
+    mark,
     engineStart() { if (marks.engine_start_ms === null) marks.engine_start_ms = p.now(); },
     godotScriptStarted() { if (marks.godot_script_start_ms === null) marks.godot_script_start_ms = p.now(); },
     playerReadyStarted() { if (marks.player_ready_start_ms === null) marks.player_ready_start_ms = p.now(); },
     playerReadyFinished() { if (marks.player_ready_end_ms === null) marks.player_ready_end_ms = p.now(); },
     sceneReady() { if (marks.scene_ready_ms === null) marks.scene_ready_ms = p.now(); ready(); },
-    loaderReady() { loaderHidden = true; ready(); },
+    loaderReady() { mark('loader_hidden_ms'); loaderHidden = true; ready(); },
     snapshot() { return result ? JSON.parse(JSON.stringify(result)) : null; }
   };
 })();
@@ -156,8 +165,8 @@ body {
 	z-index: 1;
 }
 		</style>
-		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-a2c74c248022.icon.png" />
-<link rel="apple-touch-icon" href="build-a2c74c248022.apple-touch-icon.png"/>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-9bd668197ce0.icon.png" />
+<link rel="apple-touch-icon" href="build-9bd668197ce0.apple-touch-icon.png"/>
 
 	</head>
 	<body>
@@ -170,14 +179,14 @@ body {
 		</noscript>
 
 		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-a2c74c248022.png" alt="">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-9bd668197ce0.png" alt="">
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="build-a2c74c248022.js"></script>
+		<script src="build-9bd668197ce0.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-a2c74c248022","experimentalVK":true,"fileSizes":{"build-a2c74c248022.pck":35936972,"build-a2c74c248022.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-9bd668197ce0","experimentalVK":true,"fileSizes":{"build-9bd668197ce0.pck":35938604,"build-9bd668197ce0.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -283,7 +292,7 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 		</script>
-	<div style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:10000;pointer-events:none;background:#392800e8;color:#ffe29a;padding:3px 8px;border-radius:5px;font:12px system-ui">EXPERIMENTAL · a2c74c2</div>
+	<div style="position:fixed;top:4px;left:50%;transform:translateX(-50%);z-index:10000;pointer-events:none;background:#392800e8;color:#ffe29a;padding:3px 8px;border-radius:5px;font:12px system-ui">EXPERIMENTAL · 9bd6681</div>
 </body>
 </html>
 
