@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lesen und Bearbeiten · Fahrzeug-Simulation</title>
+<style>
+*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#08121c;color:#edf5fa;font:16px/1.45 "Segoe UI",sans-serif}main{max-width:1220px;margin:auto;padding:clamp(14px,3vw,42px)}header,.bar,.heading,.row,.value{display:flex;align-items:center;gap:10px}header img{width:38px;height:38px}h1{font-size:25px;font-weight:550}h2{margin:0;color:#54cfff;font-size:20px}h3{margin:0;font-weight:550;font-size:23px}.bar{flex-wrap:wrap;margin:12px 0 24px}.row select.name{flex:1;min-width:0;width:0;color:inherit;text-overflow:ellipsis}button,input,select{font:inherit;color:inherit}button,input,select{background:#20303e;border:1px solid #496070;border-radius:5px;padding:8px 11px}button{cursor:pointer}button:hover:enabled{background:#304758}button:disabled{opacity:.4;cursor:default}:focus-visible{outline:2px solid #52d4ff;outline-offset:1px}.layout{display:grid;grid-template-columns:minmax(290px,0.85fr) minmax(320px,1.15fr);gap:18px;align-items:start}.panel{background:#101e2a;border:1px solid #304655;border-radius:8px;overflow:hidden;min-height:350px}.heading{padding:16px 19px;border-bottom:1px solid #304655}.tree{padding:12px 8px}.row{gap:1px;min-height:41px;border-radius:4px;padding-left:calc(3px + var(--level)*16px)}.row.current{background:#163b50;box-shadow:inset 3px 0 #39caff}.row button{background:transparent;border:0}.row .name{text-align:left;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.twist,.space{width:28px;flex:none}.icon{width:34px;height:34px;display:grid;place-items:center;padding:4px}.icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.row input{min-width:0;width:100%}.form{padding:20px}.type,#status,.unit{color:#a6bfce;font-size:14px}.type{margin:3px 0 18px}fieldset{border:0;border-top:1px solid #304655;margin:19px 0 0;padding:8px 0}legend{color:#add2e5;padding:0 8px 0 0}label.field{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0}.value input{width:95px}.unit{width:30px}#status{min-height:20px}dialog{max-width:min(440px,90vw);background:#152534;color:inherit;border:1px solid #496070;border-radius:8px;padding:22px}dialog::backdrop{background:#0009}dialog button{margin:4px}.note{color:#acc3d1}
+@media(max-width:690px){.layout{grid-template-columns:1fr}.panel{min-height:0}.bar{gap:6px}.form{padding:14px}}
+table{width:100%;border-collapse:collapse;margin-top:16px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #304655}
+th{color:#aac4d5;font-size:14px;font-weight:500}td:nth-child(2){color:#b6c9d6}
+td button{border:0;background:transparent;text-align:left;padding:3px;color:#edf5fa}
+tbody tr:has(button:enabled){cursor:pointer}tbody tr:has(button:enabled):hover{background:#203744}
+.row.flash{animation:inserted 1.4s ease-out}
+@keyframes inserted{0%,40%{background:#20607a;box-shadow:inset 3px 0 #58dafc}100%{background:transparent}}
+@media(prefers-reduced-motion:reduce){.row.flash{animation:none;outline:2px solid #58dafc}}
+.row .context-action { visibility: hidden; }
+.row.current .context-action, .row:focus-within .context-action { visibility: visible; }
+@media (any-hover: hover) {
+  .row:hover .context-action { visibility: visible; }
+}
+.form div.field{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:7px 0}
+.panel:nth-child(2) .heading h2 + .icon{margin-left:auto}
+.tree-heading{flex-wrap:wrap}.actions{display:flex;gap:10px;margin-left:auto}.tree-heading #status{flex-basis:100%}.tree-heading #status:empty{display:none}
+.heading h2:has(input){flex:1;min-width:0}
+.heading h2 input{width:100%;font:inherit;color:inherit}
+.heading h2 input::placeholder{color:inherit;opacity:.4}
+.form textarea{width:100%;min-height:5em;font:inherit;color:inherit;background:#20303e;border:1px solid #496070;border-radius:5px;padding:8px 11px}
+header h1{min-width:0;overflow-wrap:anywhere}
+#scene-mode{margin-inline-end:6px}
+#scene-mode[aria-pressed=true]{color:#54cfff;background:#163b50;border-color:#39caff;box-shadow:inset 0 2px 3px #08121c}
+</style>
+<main><header><img alt="" src="../form-ui/icons/simulation-scene.svg"><h1>Fahrzeug-Simulation</h1>
+<div class="actions"><button id="scene-mode" class="icon" type="button" aria-label="Szene bearbeiten" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20L5.4 15.56 L16.48 4.48L19.52 7.52L8.44 18.6 Z M5.4 15.56 L8.44 18.6"/></svg></button>
+<button id="save" class="icon" title="Szene speichern" aria-label="Szene speichern"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12l4 4v12a2 2 0 0 1-2 2Z M7 3v6h9V3 M7 21v-8h10v8"/></svg></button>
+<button id="undo" class="icon" title="Änderungen an der Szene verwerfen" aria-label="Änderungen an der Szene verwerfen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M21 3L3 21"/></svg></button>
+</div></header>
+<div class="layout"><section class="panel"><div class="heading tree-heading"><h2>Szene</h2>
+<div class="actions"><button id="new-scene" class="icon" title="Neue Szene" aria-label="Neue Szene"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5z M14 3v5h5 M8 14h8 M12 10v8"/></svg></button>
+<button id="delete-scene" class="icon" title="Szene löschen" aria-label="Szene löschen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M9 6V3h6v3M7 6l1 15h8l1-15M10 10v7M14 10v7"/></svg></button>
+</div><span id="status" role="status"></span></div><nav class="tree" aria-label="Szenenbaum"></nav></section>
+<section class="panel"><div class="heading"><h2></h2></div><div class="form"></div></section></div></main>
+<dialog><h3 id="question"></h3><p id="detail"></p><div id="choices"></div></dialog>
+<script>
+'use strict';
+const $=s=>document.querySelector(s), copy=o=>JSON.parse(JSON.stringify(o));
+const car=(id,name)=>({id,name,power:112,mass:260,wheelbase:1.4,front:50});
+const seed=[{name:'Michaels Streckenerkundung',base:'Oschersleben',cars:[car('a','Landspeeder')],rings:'Oschersleben'},
+{name:'Meine See-Erkundung',base:'Lake Tekapo',cars:[car('b','Streckenwagen')],rings:null}];
+const baseDescriptions={
+  Oschersleben:'Rennstrecke mit Boxengasse und Start-Ziel-Tribüne.',
+  'Lake Tekapo':'Seen- und Berglandschaft für Erkundungsflüge.'
+};
+seed[0].description='Mit dem Landspeeder die Strecke erkunden und durch den Ringparcours fliegen.';
+seed[1].description='Die Landschaft rund um Lake Tekapo erkunden.';
+const storageKey='veski.scenetree.kopfzeile.v1';
+let saved=copy(seed);
+try{const previous=JSON.parse(localStorage.getItem(storageKey));if(Array.isArray(previous)&&previous.every(s=>s.cars?.length))saved=previous}catch{}
+saved.forEach((scene,i)=>{scene.description??=(seed[i]?.description ?? '')});
+let index=0,draft,selected,open=new Set(),pane,category,editing=false;
+let previousOpen=null; // Während eines neuen Entwurfs bleibt index die zuvor gewählte Szene.
+const catalog = {
+  Landfahrzeuge: [
+    ['Porsche 911','Sportwagen mit Heckmotor',{power:385,mass:1505,wheelbase:2.45,front:40}],
+    ['VW Golf','Kompaktwagen mit Frontantrieb',{power:150,mass:1350,wheelbase:2.62,front:60}],
+    ['Michaels Traumauto','Eigener sportlicher Fahrzeugentwurf',{power:320,mass:1100,wheelbase:2.5,front:50}],
+    ['Einspurmodell 1','Einspurmodell mit Standardabstimmung',{power:112,mass:260,wheelbase:1.4,front:50}],
+    ['Einspurmodell 2','Längeres Fahrzeug mit anderer Achslast',{power:135,mass:350,wheelbase:1.8,front:55}]
+  ],
+  Luftfahrzeuge: [
+    ['Cessna 172','Einmotoriges Propellerflugzeug',{fuel:65}],
+    ['Airbus A320','Zweistrahliges Verkehrsflugzeug',{fuel:80}]
+  ],
+  Sonstige: []
+};
+function load(i){previousOpen=null;index=saved.length?i:-1;draft=saved.length?copy(saved[index]):null;selected='root';pane=selected;editing=false;category='Landfahrzeuge';open=new Set([...open].filter(id=>['root','vehicles','parts'].includes(id)));render();statusText('')}
+function el(tag,text){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e}
+function button(text,fn,title=text){const b=el('button',text);b.title=title;b.setAttribute('aria-label',title);b.onclick=fn;return b}
+function statusText(t){$('#status').textContent=t}
+function dirty(){return draft!==null && (previousOpen!==null || JSON.stringify(draft)!==JSON.stringify(saved[index]))}
+const sceneSelect=el('select');sceneSelect.id='scene';sceneSelect.setAttribute('aria-label','Szene auswählen');
+function sceneNameTaken(name){
+  return saved.some((scene,i)=>(previousOpen!==null||i!==index)&&scene.name===name);
+}
+function sceneNameError(){
+  if(!draft.name)return 'Bitte einen Szenennamen eingeben.';
+  if(sceneNameTaken(draft.name))return '„'+draft.name+'“ gibt es bereits. Bitte einen anderen Namen eingeben.';
+  return '';
+}
+function toolbar(){
+  const fresh=previousOpen!==null;
+  sceneSelect.replaceChildren(...saved.map((v,i)=>new Option(!fresh&&i===index?draft.name:v.name,i)));
+  if(fresh)sceneSelect.add(new Option((draft.name||'Neue Szene')+' · Entwurf',saved.length));
+  sceneSelect.value=fresh?saved.length:index;
+  const toggle=$('#scene-mode');
+  toggle.title=editing?'Zur Leseansicht wechseln':'Szene bearbeiten';
+  toggle.setAttribute('aria-pressed',String(editing));
+  $('#new-scene').disabled=!editing||fresh;
+  $('#delete-scene').disabled=!editing||fresh||!draft;
+  $('#save').disabled=!dirty()||Boolean(sceneNameError());
+  $('#undo').disabled=!dirty();
+}
+function changed(){toolbar();statusText('Ungespeichert')}
+function persistScenes(next){
+  try{localStorage.setItem(storageKey,JSON.stringify(next))}catch{statusText('Lokales Speichern fehlgeschlagen');return false}
+  saved=next;return true;
+}
+function storeDraft(){
+  if(sceneNameError()){statusText(sceneNameError());return false}
+  const next=copy(saved);
+  const target=previousOpen!==null?saved.length:index;
+  next[target]=copy(draft);
+  if(!persistScenes(next))return false;
+  index=target;previousOpen=null;toolbar();statusText('Lokal gespeichert');return true;
+}
+function ask(title,detail,actions){const d=$('dialog');$('#question').textContent=title;$('#detail').textContent=detail;$('#choices').replaceChildren(...actions.map(([text,f])=>button(text,()=>{d.close();f()})));d.showModal()}
+function leaveDraft(title,action){
+  if(!dirty()){action();return}
+  toolbar();
+  const choices=[];
+  if(!sceneNameError())choices.push(['Speichern',()=>{if(storeDraft())action()}]);
+  choices.push(['Verwerfen',action],['Abbrechen',()=>{}]);
+  ask(title,(draft.name||'Neue Szene')+' enthält Änderungen.',choices);
+}
+function newScene(){
+  previousOpen=new Set(open);
+  draft={name:'',description:'',base:'Oschersleben',cars:[car(crypto.randomUUID(),'Landspeeder')],rings:null};
+  open=new Set(['root']);category='Landfahrzeuge';
+  showPane('root');statusText('Ungespeichert');
+  $('.heading input').focus();
+}
+$('#new-scene').onclick=()=>leaveDraft('Neue Szene anlegen?',newScene);
+$('#delete-scene').onclick=()=>{
+  const name=saved[index].name;
+  const detail=dirty()?'Auch die ungespeicherten Änderungen gehen verloren.':'Die Szene wird aus der lokalen Szenenliste entfernt.';
+  ask('„'+name+'“ löschen?',detail,[['Abbrechen',()=>{}],['Löschen',()=>{
+    const next=saved.filter((scene,i)=>i!==index);
+    if(persistScenes(next))load(Math.min(index,next.length-1));
+  }]]);
+};
+$('#save').onclick=storeDraft;
+$('#undo').onclick=()=>{if(previousOpen!==null)open=previousOpen;load(index)};
+sceneSelect.onchange=e=>{const i=Number(e.target.value);leaveDraft('Szene wechseln?',()=>load(i))};
+const icons={play:'M6 3l14 9-14 9z',add:'M12 4v16M4 12h16',del:'M4 6h16M9 6V3h6v3M7 6l1 15h8l1-15M10 10v7M14 10v7'};
+function icon(which,title,fn){const b=button('',fn,title);b.className=which==='add'?'icon':'icon context-action';b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+icons[which]+'"/></svg>';return b}
+function nodes(){return {id:'root',name:draft.name,rename:draft,children:[
+{id:'base',name:'Basis · '+draft.base},
+{id:'vehicles',name:'Fahrzeuge',children:draft.cars.map(c=>({id:c.id,name:c.name,rename:c}))},
+{id:'parts',name:'Erweiterungen',children:draft.rings?[{id:'rings',name:'Ringparcours'}]:[]}]}}
+function flash(id){
+  const row=[...document.querySelectorAll('.row')].find(r=>r.dataset.id===id);
+  if(row){row.classList.add('flash');setTimeout(()=>row.classList.remove('flash'),1450)}
+}
+function inserted(id,parent,name){
+  open.add('root');open.add(parent);renderTree();flash(id);changed();
+  statusText(name+' hinzugefügt · Ungespeichert');
+}
+function addVehicle(model,defaults){
+  let name=model, suffix=2;
+  while(draft.cars.some(c=>c.name===name))name=model+' '+suffix++;
+  const vehicle={id:crypto.randomUUID(),name,model,...defaults};
+  draft.cars.push(vehicle);
+  inserted(vehicle.id,'vehicles',name);
+}
+function showPane(id,nextPane=id){selected=id;pane=nextPane;render()}
+$('#scene-mode').onclick=()=>{
+  editing=!editing;
+  showPane(selected);
+};
+function renderCatalog(f,vehicles){
+  let list;
+  if(vehicles){
+    const field=el('label','Fahrzeugart');field.className='field';
+    const select=el('select');select.setAttribute('aria-label','Fahrzeugart');
+    for(const kind of Object.keys(catalog))select.append(new Option(kind));
+    select.value=category;field.append(select);f.append(field);
+    list=catalog[category];
+    select.onchange=()=>{category=select.value;renderForm();$('.form select').focus()};
+  }else list=[['Ringparcours','Flugstrecke durch eine Folge von Ringen']];
+  const table=el('table'),header=table.createTHead().insertRow(),body=table.createTBody();
+  header.append(el('th',vehicles?'Fahrzeugmodell':'Erweiterung'),el('th','Kurzbeschreibung'));
+  for(const [name,description,defaults] of list){
+    const row=body.insertRow(),cell=row.insertCell(),summary=row.insertCell();
+    const add=()=>{
+      if(vehicles){addVehicle(name,defaults);return}
+      if(draft.rings)return;
+      draft.rings=draft.base;inserted('rings','parts',name);
+      choice.disabled=true;summary.textContent=description+' · Bereits hinzugefügt';
+    };
+    const choice=button(name,add,name+' hinzufügen');cell.append(choice);
+    choice.disabled=!vehicles&&!!draft.rings;
+    summary.textContent=description+(choice.disabled?' · Bereits hinzugefügt':'');
+    row.onclick=e=>{if(!choice.disabled&&!choice.contains(e.target))choice.click()};
+  }
+  f.append(table);
+  if(!list.length)f.append(el('p','Keine Modelle in dieser Kategorie.'));
+}
+function removeNode(n){ask('Aus der Szene entfernen?',n.name,[['Entfernen',()=>{if(n.id==='rings'){draft.rings=null;selected='parts'}else{draft.cars=draft.cars.filter(c=>c.id!==n.id);selected='vehicles'}pane=selected;render();changed()}],['Abbrechen',()=>{}]])}
+function rename(n,b){const input=el('input');input.value=n.name;input.setAttribute('aria-label','Name bearbeiten');b.replaceWith(input);input.focus();input.select();let done=false;function finish(){if(done)return;done=true;const name=input.value.trim();const conflict=n.id==='root'?saved.some((x,i)=>i!==index&&x.name===name):draft.cars.some(c=>c.id!==n.id&&c.name===name);if(name&&!conflict&&name!==n.name){n.rename.name=name;changed()}render();if(!name||conflict)statusText('Bitte einen eindeutigen Namen eingeben.')}input.onblur=finish;input.onkeydown=e=>{if(e.key==='Enter')input.blur()}}
+function renderTree(){const tree=$('.tree');tree.replaceChildren();function visit(n,level){const row=el('div');row.className='row'+(selected===n.id?' current':'');row.style.setProperty('--level',level);tree.append(row);row.dataset.id=n.id;
+if(n.children?.length){const b=button(open.has(n.id)?'▾':'▸',()=>{if(open.has(n.id))open.delete(n.id);else open.add(n.id);renderTree()},n.name+' auf-/zuklappen');b.className='twist';b.setAttribute('aria-expanded',open.has(n.id));row.append(b)}else{const space=el('span');space.className='space';row.append(space)}
+function selectNode(){
+  selected=n.id;pane=n.id;renderForm();
+  for(const r of tree.children){r.classList.toggle('current',r===row);r.querySelector('.name')?.removeAttribute('aria-current')}
+  label.setAttribute('aria-current','true');
+}
+const label=n.id==='root'?sceneSelect:button(n.name,selectNode,n.name);
+if(n.id==='root'){label.onfocus=selectNode;label.onclick=selectNode}
+label.className='name';if(n.id===selected)label.setAttribute('aria-current','true');row.append(label);
+if(editing&&n.rename&&n.id!=='root'){label.ondblclick=()=>rename(n,label);label.title='Doppelklick zum Umbenennen'}
+if(editing&&(n.id==='vehicles'||n.id==='parts')){
+  row.append(icon('add',n.id==='vehicles'?'Fahrzeugkatalog öffnen':'Katalog für Erweiterungen öffnen',()=>showPane(n.id,'catalog')));
+}
+if(editing&&(n.id==='rings'||(n.rename&&n.id!=='root'))){const b=icon('del',n.name+' entfernen',()=>removeNode(n));b.disabled=n.id!=='rings'&&draft.cars.length===1;if(b.disabled)b.title='Mindestens ein Fahrzeug bleibt im Szene';row.append(b)}
+if(open.has(n.id))for(const child of n.children||[])visit(child,level+1)}
+visit(nodes(),0)}
+function renderForm(){const f=$('.form');f.replaceChildren();function head(name,type){title.textContent=name;const p=el('p',type);p.className='type';f.append(p)}
+function group(name){const fs=el('fieldset');fs.append(el('legend',name));f.append(fs);return fs}
+const heading=$('.panel:nth-child(2) .heading');heading.querySelectorAll('button').forEach(b=>b.remove());
+const title=heading.querySelector('h2');
+if(pane==='catalog'){title.textContent=selected==='vehicles'?'Fahrzeug hinzufügen':'Erweiterung hinzufügen';renderCatalog(f,selected==='vehicles');return}
+const c=draft.cars.find(c=>c.id===pane);
+function fieldValue(parent,title,value){
+  const line=el('div');line.className='field';
+  line.append(el('span',title),el('span',value));parent.append(line);
+}
+if(pane==='root'){
+  heading.append(icon('play','Szene starten',()=>ask('Startvorschau',draft.name+' · '+draft.base+' · '+draft.cars.map(car=>car.name).join(', '),[['Zurück',()=>{}]])));
+}
+function editableTitle(item, label, nameTaken){
+  if(!editing)return;
+  const input=el('input');
+  input.value=item.name;
+  input.setAttribute('aria-label',label);
+  if(item===draft){
+    input.placeholder='Name der Szene';
+    input.onkeydown=e=>{
+      if(e.isComposing||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
+      if(e.key==='Tab'){
+        e.preventDefault();
+        $('.form textarea').focus();
+      }else if(e.key==='Enter'){
+        e.preventDefault();
+        if(input.getAttribute('aria-invalid')==='true')return;
+        $('#save').click();
+        if(!dirty()){input.value=item.name;original=item.name}
+      }
+    };
+  }
+  title.replaceChildren(input);
+  let original=item.name;
+  input.onfocus=()=>{original=item.name};
+  input.oninput=()=>{
+    const name=input.value.trim();
+    const valid=Boolean(name)&&!nameTaken(name);
+    input.setAttribute('aria-invalid',String(!valid));
+    item.name=(valid||item===draft)?name:original;
+    renderTree();
+    toolbar();
+    if(valid)statusText(dirty()?'Ungespeichert':'');
+    else if(!name)statusText('Bitte einen '+label+'n eingeben.');
+    else if(item===draft)statusText(sceneNameError());
+    else statusText('Unter „Fahrzeuge“ gibt es in dieser Szene bereits „'+name+'“.');
+  };
+  input.onblur=()=>{input.value=item.name;input.removeAttribute('aria-invalid')};
+}
+if(pane==='root'){
+  head(draft.name||'Neue Szene',draft.description);
+  if(editing){
+    const description=el('textarea');
+    description.value=draft.description;
+    description.setAttribute('aria-label','Kurzbeschreibung');
+    description.oninput=()=>{draft.description=description.value;changed()};
+    f.replaceChildren(description);
+  }
+  editableTitle(draft,'Szenenname',sceneNameTaken);
+  return;
+}
+if(pane==='vehicles'||pane==='parts'){
+  title.textContent=pane==='vehicles'?'Fahrzeuge':'Erweiterungen';
+  fieldValue(f,'Anzahl',pane==='vehicles'?draft.cars.length:Number(!!draft.rings));return;
+}
+
+if(c){head(c.name,c.model||'Einspurmodell');
+editableTitle(c,'Fahrzeugname',name=>draft.cars.some(other=>other.id!==c.id&&other.name===name));
+function number(parent,key,title,unit,min,max,step){if(!editing){fieldValue(parent,title,c[key].toLocaleString('de-DE')+' '+unit);return}const l=el('label',title);l.className='field';const v=el('span');v.className='value';const i=el('input');i.type='number';Object.assign(i,{min,max,step,value:c[key]});i.oninput=()=>{if(i.validity.valid&&i.value!==''){c[key]=i.valueAsNumber;changed()}};i.onblur=()=>{if(!i.validity.valid||i.value===''){i.value=c[key];statusText('Letzter gültiger Wert übernommen.')}};const u=el('span',unit);u.className='unit';v.append(i,u);l.append(v);parent.append(l)}
+if('fuel' in c){number(group('Flugzeug'),'fuel','Tankfüllung','%',0,100,1);return}
+number(group('Antrieb'),'power','Motorleistung','PS',1,3000,1);const geometry=group('Fahrwerk');number(geometry,'mass','Masse','kg',1,10000,1);number(geometry,'wheelbase','Radstand','m',0.1,12,0.01);number(geometry,'front','Last auf der Vorderachse','%',1,99,1);return}
+if(pane==='base'){head('Basis · '+draft.base,baseDescriptions[draft.base]);if(!editing)return;const l=el('label','Szene');l.className='field';const s=el('select');s.append(new Option('Oschersleben'),new Option('Lake Tekapo'));s.value=draft.base;s.onchange=()=>{draft.base=s.value;open.add('root');render();flash('base');changed()};l.append(s);f.append(l);if(draft.rings&&draft.rings!==draft.base)f.append(el('p','Für den Ringparcours ist eine neue Platzierung erforderlich.'));return}
+if(pane==='rings'){head('Ringparcours','Erweiterung');f.append(el('p','Platzierung: '+draft.rings));if(editing&&draft.rings!==draft.base)f.append(button('Platzierung für '+draft.base+' übernehmen',()=>{draft.rings=draft.base;render();changed()}));return}
+}
+function render(){
+  toolbar();
+  if(draft){renderTree();renderForm();return}
+  $('.tree').replaceChildren();
+  $('.panel:nth-child(2) .heading').replaceChildren(el('h2','Keine Szene'));
+  $('.form').replaceChildren(el('p',editing?'Mit „Neue Szene“ kannst du eine Szene anlegen.':'Zum Anlegen einer Szene den Bleistift wählen.'));
+}
+load(0);
+</script></html>

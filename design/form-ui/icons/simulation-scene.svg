@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 48 48" fill="none" stroke="#ecf5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="title">
+  <title id="title">Simulation bearbeiten – Fahrzeug in einer Landschaft</title>
+  <path d="M5 22 14 11 23 20 30 16 43 25"/>
+  <circle cx="35" cy="10" r="3"/>
+  <path d="M5 44h38"/>
+  <path d="M13 37h-3v-5l5-1 4-5h10l5 6 5 1v4h-4M19 37h10"/>
+  <path d="m15 31 19 1M24 27v5"/>
+  <circle cx="16" cy="37" r="3"/>
+  <circle cx="32" cy="37" r="3"/>
+</svg>
