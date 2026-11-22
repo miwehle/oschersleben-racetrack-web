@@ -8,6 +8,11 @@ on:
       - "design/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
+    inputs:
+      experimental_artifact_url:
+        description: Temporary download URL of the tested experimental web ZIP
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -31,6 +36,23 @@ jobs:
 
       - name: Include design previews
         run: cp -R design site/design
+
+      - name: Include experimental build artifact
+        if: inputs.experimental_artifact_url != ''
+        env:
+          ARTIFACT_URL: ${{ inputs.experimental_artifact_url }}
+        run: |
+          curl --fail --location --retry 3 "$ARTIFACT_URL" -o /tmp/experimental.zip
+          rm -rf site/experimental
+          mkdir -p site/experimental
+          unzip -q /tmp/experimental.zip -d site/experimental
+          test -f site/experimental/index.html
+
+      - name: Check Pages site size
+        run: |
+          bytes=$(du --bytes --summarize site | cut -f1)
+          echo "Pages site: $bytes bytes" >> "$GITHUB_STEP_SUMMARY"
+          test "$bytes" -le 1000000000 || { echo 'Pages site exceeds 1 GB'; exit 1; }
 
       - uses: actions/upload-pages-artifact@v4
         with:
