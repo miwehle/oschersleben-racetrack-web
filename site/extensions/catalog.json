@@ -1,0 +1,11 @@
+{
+  "ringflug": {
+    "title": "Ringparcours",
+    "version": 1,
+    "path": "res://extensions/ringflug/ringflug.tscn",
+    "component": "res://extensions/ringflug/course.tscn",
+    "companion": false,
+    "sha256": "6c935e1556572d4aca91610cd5c29445aa4e8e3b37c7f77e06380366afadabba",
+    "url": "ringflug-1.zip"
+  }
+}

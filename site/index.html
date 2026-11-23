@@ -13,6 +13,7 @@
     ground_placed_ms: null, scene_ready_wait_start_ms: null, frame_wait_start_ms: null,
     frame_drawn_ms: null, loader_hidden_ms: null
   };
+  const packages = [];
   let result = null, loaderHidden = false, hidden = document.hidden;
   const visibility = () => { hidden = hidden || document.hidden; };
   document.addEventListener('visibilitychange', visibility);
@@ -44,9 +45,12 @@
     const assets = resources.filter(r => /\.(wasm|pck)(?:[?#]|$)/.test(r.name));
     const wasm = resources.filter(r => /\.wasm(?:[?#]|$)/.test(r.name));
     const stem = wasm.length === 1 ? new URL(wasm[0].name).pathname.replace(/\.wasm$/, '') : null;
-    const asset_delivery = {};
+    const asset_delivery = {}, asset_timings = {};
     for (const ext of ['js', 'wasm', 'pck']) {
       const matches = resources.filter(r => new URL(r.name).pathname === stem + '.' + ext);
+      asset_timings[ext] = matches.map(r => Object.fromEntries(
+        ['startTime', 'responseEnd', 'transferSize', 'encodedBodySize', 'decodedBodySize',
+         'workerStart', 'deliveryType', 'responseStatus'].map(key => [key, r[key] ?? null])));
       asset_delivery[ext] = matches.length === 1 ? delivery(matches[0]) : 'unknown';
     }
     const types = Object.values(asset_delivery);
@@ -60,11 +64,22 @@
       assets_finished_ms: assets.length ? round(Math.max(...assets.map(r => r.responseEnd))) : null,
       transfer_bytes: sum('transferSize'), encoded_body_bytes: sum('encodedBodySize'),
       resource_count: entries.length, timing_available: !!nav,
-      navigation_type: nav?.type || 'unknown', cache, asset_delivery, hidden_during_start: !!hidden
+      navigation_type: nav?.type || 'unknown', cache, asset_delivery, asset_timings, packages, hidden_during_start: !!hidden
     };
   }
   window.OscherslebenStartup = {
     mark,
+    packageStart(kind, id) {
+      if (result) return -1; // Only operations begun during startup belong to this record.
+      packages.push({kind, id, start_ms: round(p.now()), end_ms: null, success: null});
+      return packages.length - 1;
+    },
+    packageEnd(index, success) {
+      const operation = packages[index];
+      if (!operation || operation.end_ms !== null) return;
+      operation.end_ms = round(p.now()); // A download may finish after scene readiness.
+      operation.success = !!success;
+    },
     engineStart() { if (marks.engine_start_ms === null) marks.engine_start_ms = p.now(); },
     godotScriptStarted() { if (marks.godot_script_start_ms === null) marks.godot_script_start_ms = p.now(); },
     playerReadyStarted() { if (marks.player_ready_start_ms === null) marks.player_ready_start_ms = p.now(); },
@@ -165,8 +180,8 @@ body {
 	z-index: 1;
 }
 		</style>
-		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-c9749f925f51.icon.png" />
-<link rel="apple-touch-icon" href="build-c9749f925f51.apple-touch-icon.png"/>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="build-70c332bc1e99.icon.png" />
+<link rel="apple-touch-icon" href="build-70c332bc1e99.apple-touch-icon.png"/>
 
 	</head>
 	<body>
@@ -179,14 +194,14 @@ body {
 		</noscript>
 
 		<div id="status">
-			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-c9749f925f51.png" alt="">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="build-70c332bc1e99.png" alt="">
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
 
-		<script src="build-c9749f925f51.js"></script>
+		<script src="build-70c332bc1e99.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-c9749f925f51","experimentalVK":true,"fileSizes":{"build-c9749f925f51.pck":36006172,"build-c9749f925f51.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"build-70c332bc1e99","experimentalVK":true,"fileSizes":{"build-70c332bc1e99.pck":35976012,"build-70c332bc1e99.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
