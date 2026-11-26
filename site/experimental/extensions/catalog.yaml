@@ -3,49 +3,56 @@ base_scene_installer:
   version: 1
   path: res://extensions/base_scene_installer/base_scene_installer.tscn
   companion: true
-  sha256: c9e64e254311ba043952809824194df0a84563fbff67b79113eca966051f037e
+  sha256: de5e4ed8c2a538a8abffcbb0a378e6daa5771a53f1a21a2e9e8f3a9f9b00e2e0
   url: base_scene_installer-1.zip
+cessna172:
+  title: Cessna 172P · JSBSim
+  version: 1
+  path: res://extensions/cessna172/cessna_extension.tscn
+  companion: true
+  sha256: 334f35eb8627e018d02e7e5508ffd8f1125658fa506e85634e3752896a5f871c
+  url: cessna172-1.zip
 collisions:
   title: Kollisionen
   version: 1
   path: res://extensions/collisions/collisions.tscn
   companion: true
-  sha256: 1ef22ea87307fe80899faec6d06415a66fbb8a79aaaa9394d70d88c815ff94a9
+  sha256: e12f5dad50cf1bdf946d3970b65782703b71108581f9c455c4994adde3f923e0
   url: collisions-1.zip
 diagnostics:
   title: Diagnose
   version: 1
   path: res://extensions/diagnostics/diagnostics.tscn
   companion: true
-  sha256: 3f45f348b0e7900f3e33f61c797aca15f24f64299104e29e2e8990be9be39204
+  sha256: cd4a233af38094740ed179593cb673435db0f85686b860b1a4ceff02dd5b51e6
   url: diagnostics-1.zip
 flight_path_assist:
   title: Flugassistent
   version: 1
   path: res://extensions/flight_path_assist/flight_path_assist.tscn
   companion: true
-  sha256: 036771038cef35dcc547be9bc7cb4b1941d87f4b026c372d6d3e98da2cb518ff
+  sha256: d795dcd30ad2986cf55e9a6d95914587ce5e701b631b76d403a4de23dc7b5393
   url: flight_path_assist-1.zip
 gamepad_monitor:
   title: Gamepad Monitor
   version: 1
   path: res://extensions/gamepad_monitor/gamepad_monitor.tscn
   companion: true
-  sha256: 73d95e564eab28c77e26e8e2e907a782dc8b8796c9f92e72d39aa669e62cf546
+  sha256: 9949feb1095f8f78afa4bcb645599f9c77224a1127c5b14d41fd6b38989d47e6
   url: gamepad_monitor-1.zip
 grip_feedback:
   title: Grip Feedback
   version: 1
   path: res://extensions/grip_feedback/grip_feedback.tscn
   companion: true
-  sha256: f2735d2c8fb535943bf24d942bc97655ccfab9587878df1ac4d1e4583c4335af
+  sha256: 826740ab86681b640d1e314f3bf141b1e58f43164384bd932ca2bd4e50787ab6
   url: grip_feedback-1.zip
 multiplayer:
   title: Multiplayer
   version: 1
   path: res://extensions/multiplayer/multiplayer.tscn
   companion: true
-  sha256: e0f75bf0b3d427dc220927d142e2e2012b8c658c0df2631c1e70f15c3a3e5a72
+  sha256: 268d94789c18bf67637722c99f387bb6323af8d1f71b66a07d3afaeb38741271
   url: multiplayer-1.zip
 ringflug:
   title: Ringparcours
@@ -53,12 +60,12 @@ ringflug:
   path: res://extensions/ringflug/ringflug.tscn
   component: res://extensions/ringflug/course.tscn
   companion: false
-  sha256: 6c935e1556572d4aca91610cd5c29445aa4e8e3b37c7f77e06380366afadabba
+  sha256: b316105c19c4af63cfa6013db173205458d0ac84eefe05e712fec0c4b61c1104
   url: ringflug-1.zip
 telemetry:
   title: Telemetrie
   version: 1
   path: res://extensions/telemetry/telemetry.tscn
   companion: true
-  sha256: b3379e9dc56cc78bdc002e2905b4f7ac08d99570459a392ce7fd315f27df8bce
+  sha256: cd8421f47a77fa8941263440958a627a14d0ca26667ca3d1db00b0130e8dea5d
   url: telemetry-1.zip
