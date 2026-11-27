@@ -4,7 +4,7 @@
     "version": 1,
     "path": "res://extensions/base_scene_installer/base_scene_installer.tscn",
     "companion": true,
-    "sha256": "de5e4ed8c2a538a8abffcbb0a378e6daa5771a53f1a21a2e9e8f3a9f9b00e2e0",
+    "sha256": "7b2fa303fa93436b0acfaadb5b2ba186fcd928c4705e392383db79a96a7cbca7",
     "url": "base_scene_installer-1.zip"
   },
   "cessna172": {
@@ -12,7 +12,7 @@
     "version": 1,
     "path": "res://extensions/cessna172/cessna_extension.tscn",
     "companion": true,
-    "sha256": "d53c62a57ccfb9d3a334ca9c5d5a0746abbef43a7e8a82ccaabd057a0b8256c5",
+    "sha256": "3734466d6b5f8b2ce2f57dd5a76cd78b1de47025b9d0c7621f0546046ce7c442",
     "url": "cessna172-1.zip"
   },
   "collisions": {
