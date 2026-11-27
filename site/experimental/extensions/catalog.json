@@ -12,7 +12,7 @@
     "version": 1,
     "path": "res://extensions/cessna172/cessna_extension.tscn",
     "companion": true,
-    "sha256": "334f35eb8627e018d02e7e5508ffd8f1125658fa506e85634e3752896a5f871c",
+    "sha256": "d53c62a57ccfb9d3a334ca9c5d5a0746abbef43a7e8a82ccaabd057a0b8256c5",
     "url": "cessna172-1.zip"
   },
   "collisions": {
