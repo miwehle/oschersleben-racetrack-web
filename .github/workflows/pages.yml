@@ -32,6 +32,15 @@ jobs:
       - name: Include design previews
         run: cp -R design site/design
 
+      - name: Include experimental Tekapo landscape
+        run: |
+          mkdir -p site/experimental-landscape
+          curl --fail --location --retry 3 --output site/experimental-landscape/tekapo_full_detail_streaming-2.zip https://github.com/miwehle/veski-tekapo-web/releases/download/tekapo-shadow-9bbaee5/tekapo_full_detail_streaming-2.zip
+          echo "2823a62f14f7ee189cfa08de5331c9049fa423c5077f4b6d84ec53e372fd2bf0  site/experimental-landscape/tekapo_full_detail_streaming-2.zip" | sha256sum --check
+          cat > site/experimental-landscape/flight.json <<JSON
+          {"api": 1, "title": "Cessna 172P über Lake Tekapo · Schattenversuch", "vehicle": "cessna172", "extension": "cessna172", "base": "tekapo_full_detail_streaming", "package": {"id": "tekapo_full_detail_streaming", "url": "tekapo_full_detail_streaming-2.zip", "bytes": 556448256, "sha256": "2823a62f14f7ee189cfa08de5331c9049fa423c5077f4b6d84ec53e372fd2bf0"}}
+          JSON
+
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
